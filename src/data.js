@@ -67,7 +67,7 @@ const newUser = async (name, username, password) => {
   return response.rows[0];
 }
 const loginUser = async (username, password) => {
-  let sql = 'SELECT userID, name, username FROM Users WHERE username = $1';
+  let sql = 'SELECT * FROM Users WHERE username = $1';
   let response = await execute(sql, [username]);
   if (response.rows.length === 0) {
     throw new Error('Username not found');
@@ -76,6 +76,7 @@ const loginUser = async (username, password) => {
   if (user.password !== password) {
     throw new Error('Passwords not matching')
   }
+  delete user.password;
   return user;
 }
 
