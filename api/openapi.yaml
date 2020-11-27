@@ -1,0 +1,237 @@
+#
+# zlind/beer
+#
+
+openapi: '3.0.3'
+
+info:
+  description: zlind/beer
+  version: 0.1.0
+  title: zlind/beer
+
+servers:
+  - url: http://localhost:3010
+
+components:
+  schemas:
+    Beer:
+      type: object
+      properties:
+        beerid:
+          type: string
+          format: uuid
+          readOnly: true
+        breweryid:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: Torpedo
+        type:
+          type: string
+          example: IPA
+      required:
+        - beerid
+        - breweryid
+        - name
+        - type
+    Brewery:
+      type: object
+      properties:
+        breweryid:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          example: Sierra Nevada
+        location:
+          type: string
+          example: Chico, CA
+      required:
+        - breweryid
+        - name
+        - location
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+          example: zlind
+        password:
+          type: string
+          example: pAsSwOrD!123
+          writeOnly: true
+      required:
+        - username
+    FullUser:
+      allOf:
+        - $ref: '#/components/schemas/User'
+        - type: object
+          properties:
+            userid:
+              type: string
+              format: uuid
+              readOnly: true
+            name:
+              type: string
+              example: Zach Lind
+          required:
+            - userid
+            - name
+
+paths:
+  /v0/brewery:
+    get:
+      description: Returns all breweries
+      parameters:
+        - name: name
+          in: query
+          schema:
+            type: string
+      responses:
+        200:
+          description: Breweries Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Brewery'
+        404:
+          description: Brewery name not found
+    post:
+      description: Create new brewery
+      requestBody:
+        description: new brewery
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Brewery'
+      responses:
+        200:
+          description: Brewery created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Brewery'
+  /v0/beer:
+    get:
+      description: Returns all beers
+      parameters:
+        - name: breweryID
+          in: query
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Beers Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Beer'
+        404:
+          description: breweryID not found
+    post:
+      description: Create new beer
+      requestBody:
+        description: new beer
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Beer'
+      responses:
+        200:
+          description: Beer created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Beer'
+        404:
+          description: Brewery not found
+  /v0/user:
+    get:
+      description: Returns all users
+      parameters:
+        - name: username
+          in: query
+          schema:
+            type: string
+      responses:
+        200:
+          description: Users Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FullUser'
+        404:
+          description: username not found
+    post:
+      description: Create new user
+      requestBody:
+        description: new user
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FullUser'
+      responses:
+        200:
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FullUser'
+        500:
+          description: Username taken
+  /v0/login:
+    post:
+      description: Login user
+      requestBody:
+        description: user info
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        200:
+          description: Login success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FullUser'
+        404:
+          description: Username not found
+        500:
+          description: Invalid password
+  /v0/functions:
+    post:
+      description: Run functions on database
+      requestBody:
+        description: function name
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: reset
+              required:
+                - name
+      responses:
+        200:
+          description: Function success
+        500:
+          description: Function failure
+        404:
+          description: Invalid function
