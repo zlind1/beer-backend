@@ -4,8 +4,10 @@ const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 
 const pool = new Pool({
-  host: 'localhost',
-  user: 'zlind'
+  host: 'zlind-db.cku9tw8svhmt.us-west-1.rds.amazonaws.com',
+  database: 'postgres',
+  user: 'zlind',
+  password: 'password'
 });
 
 const execute = async (sql, params=[]) => {
