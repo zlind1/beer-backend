@@ -11,6 +11,7 @@ info:
 
 servers:
   - url: http://localhost:3010
+  - url: https://zlind-beers.herokuapp.com
 
 components:
   schemas:
