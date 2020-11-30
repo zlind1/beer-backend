@@ -2,6 +2,7 @@ const { Pool } = require('pg');
 const fs = require('fs');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
+const auth = require('./auth');
 
 const pool = new Pool({
   host: 'zlind-db.cku9tw8svhmt.us-west-1.rds.amazonaws.com',
@@ -64,29 +65,35 @@ const getUsers = async (username=null) => {
   return response.rows;
 }
 const newUser = async (name, username, password) => {
-  const sql = 'INSERT INTO Users VALUES ($1, $2, $3, $4) RETURNING userID, name, username';
-  const response = await execute(sql, [uuidv4(), name, username, password]);
+  const salt = auth.createSalt();
+  console.log(salt);
+  password = auth.hash(password, salt);
+  const sql = 'INSERT INTO Users VALUES ($1, $2, $3, $4, $5) RETURNING userID, name, username';
+  const response = await execute(sql, [uuidv4(), name, username, password, salt]);
   return response.rows[0];
 }
-const loginUser = async (username, password) => {
+const login = async (username, password) => {
   let sql = 'SELECT * FROM Users WHERE username = $1';
   let response = await execute(sql, [username]);
   if (response.rows.length === 0) {
     throw new Error('Username not found');
   }
   const user = response.rows[0];
-  if (user.password !== password) {
+  if (user.password !== auth.hash(password, user.salt)) {
     throw new Error('Passwords not matching')
   }
   delete user.password;
+  delete user.salt;
   return user;
 }
 
-exports.login = loginUser;
-exports.runFile = runFile;
-exports.getBreweries = getBreweries;
-exports.getBeers = getBeers;
-exports.getUsers = getUsers;
-exports.newBrewery = newBrewery;
-exports.newBeer = newBeer;
-exports.newUser = newUser;
+module.exports = {
+  login,
+  runFile,
+  getBreweries,
+  getBeers,
+  getUsers,
+  newBrewery,
+  newBeer,
+  newUser
+};

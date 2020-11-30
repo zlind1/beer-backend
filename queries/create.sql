@@ -21,7 +21,8 @@ CREATE TABLE Users (
   userID CHAR(36),
   name VARCHAR(50) NOT NULL,
   username VARCHAR(50) UNIQUE,
-  password CHAR(64),
+  password CHAR(44),
+  salt CHAR(44),
   PRIMARY KEY(userID)
 );
 

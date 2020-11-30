@@ -208,11 +208,18 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FullUser'
+                type: string
+                format: JWT
         404:
           description: Username not found
         500:
           description: Invalid password
+  /v0/logout:
+    post:
+      description: Logout user
+      responses:
+        200:
+          description: Logout success
   /v0/functions:
     post:
       description: Run functions on database
