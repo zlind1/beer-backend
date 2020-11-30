@@ -132,7 +132,7 @@ app.post('/v0/login', async(req, res) => {
     throw e;
   }
 });
-app.post('/v0/logout', expressToken, async(req, res) => {
+app.post('/v0/logout', async(req, res) => {
   auth.deleteCookies(res);
   res.sendStatus(200);
 });
