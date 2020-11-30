@@ -32,7 +32,8 @@ const createJwt = (user) => {
 const saveCookies = (res, token) => {
   res.cookie('JWT', token, {
     maxAge: 3600000,
-    httpOnly: true
+    httpOnly: true,
+    sameSite: 'none'
   });
   res.cookie('validToken', 'true', {
     maxAge: 3600000,
